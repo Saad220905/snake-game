@@ -1,28 +1,43 @@
+/*
+This is a snake game built built by Rachel and Saad,
+this file contains the declarations of the board class.
+*/
+
 #ifndef BOARD_H 
 #define BOARD_H 
 
+#include <iostream>
+#include <vector>
+#include <array>
+#include <iomanip>
+#include <cstdlib>
+#include <string>
+
+struct Location {
+    public:
+        int row;
+        int col;
+};
+
 class Board {
 private:
-    int** panel; 
+    string** panel;
+    vector<array<int, 2>> snake;
        //two dimensional array with numRows rows
        //and numCols columns
-    int numRows; 
-    int numCols;
-    int target; //what is the goal
+    array<int, 2> head;
+    array<int, 2> tail;
+    int numRows;
     int max; //the current max in all cells of panel
         //apply dynamic memory for panel
         //so that panel has numRows rows and
         //numCols columns
 
 public:
-    Board(); //construct a 3 x 3 panel
+    Board(); //construct a 8 x 8 panel
     Board(int m); //construct a m x m panel
-    Board(int m, int n); //construct a m x n panel
     void setTarget(int goal);
         //set target (goal) of the game
-    ~Board(); //destructor,
-        //when no longer need the current object,
-        //release dynamic memory of this object.
     void allocateMemory();
     int getNumRows() const;
     int getNumCols() const;
@@ -40,9 +55,5 @@ public:
     void pressLeft();
     void pressRight(); //press right key
     void start(); //start the game
-    bool noAdjacentSameValue() const;
-        //if there is no two adjacent cells
-        //share same value, return true,
-        //otherwise, return false.
 };
 #endif

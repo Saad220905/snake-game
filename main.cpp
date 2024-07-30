@@ -19,7 +19,7 @@ int main()
 */
 int main()
 {
-    Board game(3, 3); //create a Board object with 3 rows and 3 columns.
+    Board game(8); //create a Board object with 8 rows and 8 columns.
     game.start();
     return 0;
 }
