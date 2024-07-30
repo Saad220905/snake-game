@@ -21,12 +21,11 @@ struct Location {
 
 class Board {
 private:
-    string** panel;
-    vector<array<int, 2>> snake;
-       //two dimensional array with numRows rows
-       //and numCols columns
-    array<int, 2> head;
-    array<int, 2> tail;
+    std::string** panel;
+    //vector<array<int, 2>> snake;
+       //two dimensional array with numRows rows and columns
+    Location head;
+    Location tail;
     int numRows;
     int max; //the current max in all cells of panel
         //apply dynamic memory for panel
@@ -48,6 +47,7 @@ public:
         //set each cell of the panel to be zero
     void print() const;
         //print the panel
+    std::vector<Location> Board::getEmptys() const;
     void selectRandomCell(int& row, int& col);
         //select a random cell from empty cell
     void pressUp();
