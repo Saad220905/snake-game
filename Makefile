@@ -9,7 +9,7 @@
 #  -Wall turns on most, but not all, compiler warnings
 #
 # for C++ define  CC = g++
-CC = g++ -std=c++11
+CC = g++ -std=c++20
 CFLAGS  = -g -Wall
 
 # typing 'make' will invoke the first target entry in the file 
