@@ -139,34 +139,34 @@ void Board::start() {
         if (ch == 'S')
             break;
 
-    if (ch == '\033') {
-        getchar();
-        switch(getchar()) {
-            case 'A':
-                std::cout << "Round " << std::setw(4) << round << ": ";
-                std::cout << "Press UP. " << std::endl;
-                pressUp();
-                round++;
-                break;
-            case 'B':
-                std::cout << "Round " << std::setw(4) << round << ": ";
-                std::cout << "Press DOWN. " << std::endl;
-                pressDown();
-                round++;
-                break;
-            case 'C':
-                std::cout << "Round " << std::setw(4) << round << ": ";
-                std::cout << "Press RIGHT. " << std::endl;
-                pressRight();
-                round++;
-                break;
-            case 'D':
-                std::cout << "Round " << std::setw(4) << round << ": ";
-                std::cout << "Press LEFT. " << std::endl;
-                pressLeft();
-                round++;
-                break;
-            
+        if (ch == '\033') {
+            getchar();
+            switch(getchar()) {
+                case 'A':
+                    std::cout << "Round " << std::setw(4) << round << ": ";
+                    std::cout << "Press UP. " << std::endl;
+                    pressUp();
+                    round++;
+                    break;
+                case 'B':
+                    std::cout << "Round " << std::setw(4) << round << ": ";
+                    std::cout << "Press DOWN. " << std::endl;
+                    pressDown();
+                    round++;
+                    break;
+                case 'C':
+                    std::cout << "Round " << std::setw(4) << round << ": ";
+                    std::cout << "Press RIGHT. " << std::endl;
+                    pressRight();
+                    round++;
+                    break;
+                case 'D':
+                    std::cout << "Round " << std::setw(4) << round << ": ";
+                    std::cout << "Press LEFT. " << std::endl;
+                    pressLeft();
+                    round++;
+                    break;
+                
             }
         }
     }

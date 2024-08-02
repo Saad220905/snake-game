@@ -3,8 +3,8 @@ This is a snake game built built by Rachel and Saad,
 this file contains the declarations of the board class.
 */
 
-#ifndef BOARD_H 
-#define BOARD_H 
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <iostream>
 #include <vector>
@@ -22,7 +22,7 @@ struct Location {
 class Board {
 private:
     std::string** panel;
-    //vector<array<int, 2>> snake;
+    std::vector<Location> snake;
        //two dimensional array with numRows rows and columns
     Location head;
     Location tail;
@@ -60,4 +60,4 @@ public:
 
 
 };
-#endif
+#endif //BOARD_H

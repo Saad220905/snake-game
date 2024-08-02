@@ -23,6 +23,7 @@ all: run
 # RunCompetition.o, Competition.o, Hare.o, Tortoise.o, and Road.o:
 run:  main.o Board.o 
 	$(CC) -o run main.o Board.o
+	$(RM) *.o
 
 # To create the object file RunCompetition.o, we need the source
 # files RunCompetition.cpp, Competition.h 
@@ -40,4 +41,4 @@ Board.o:  Board.cpp
 # files and *~ backup files:
 #
 clean: 
-	$(RM) run *.o *~
+	$(RM) run *~ a.out
