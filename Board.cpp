@@ -9,6 +9,7 @@ Board::Board() : Board(8) {
 }
 
 Board::Board(int m) {
+    
     srand(1);
     if (m >= 8)
         numRows = m;
@@ -20,9 +21,19 @@ Board::Board(int m) {
         panel[col] = new std::string[numRows];
     }
     clear();
+    snakeLength = 2;
+    head = {numRows/2,numRows/2};
+    tail = {numRows/2,(numRows/2)-1};
+    
+    panel[numRows/2][numRows/2] = " 🐸 ";
+    panel[numRows/2][(numRows/2)-1] = " 🟩 ";
     max = 0;
 }
 
+void Board::setTarget(const int& goal)
+{
+    target = goal;
+}
 int Board::getNumRows() const {
     return numRows;
 }
@@ -69,7 +80,7 @@ void Board::selectRandomCell(int& row, int& col) {
         int index = rand() % emptys.size();
         row = emptys[index].row;
         col = emptys[index].col;
-        panel[row][col] = "🍎";
+        panel[row][col] = " 🍎 ";
         print();
     }
     if(emptys.size() == 0 || emptys.size() == 1) {
@@ -91,6 +102,7 @@ std::vector<Location> Board::getEmptys() const {
             }
         }
     }
+    return emptys;
 }
 
 void Board::pressUp() {
@@ -113,7 +125,7 @@ void Board::start() {
     int round = 1;
     int row, col;
     selectRandomCell(row, col);
-    selectRandomCell(row, col);
+    //selectRandomCell(row, col);
     max = 1;
 
     char ch;

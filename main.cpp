@@ -19,6 +19,8 @@ int main()
 */
 int main()
 {
+//     string s = "😊";
+//     cout << s;
     Board game(8); //create a Board object with 8 rows and 8 columns.
     game.start();
     return 0;

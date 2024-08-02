@@ -31,11 +31,13 @@ private:
         //apply dynamic memory for panel
         //so that panel has numRows rows and
         //numCols columns
+    int target;
+    int snakeLength;
 
 public:
     Board(); //construct a 8 x 8 panel
     Board(int m); //construct a m x m panel
-    void setTarget(int goal);
+    void setTarget(const int& goal);
         //set target (goal) of the game
     void allocateMemory();
     int getNumRows() const;
@@ -47,7 +49,7 @@ public:
         //set each cell of the panel to be zero
     void print() const;
         //print the panel
-    std::vector<Location> Board::getEmptys() const;
+    std::vector<Location> getEmptys() const;
     void selectRandomCell(int& row, int& col);
         //select a random cell from empty cell
     void pressUp();
@@ -55,5 +57,7 @@ public:
     void pressLeft();
     void pressRight(); //press right key
     void start(); //start the game
+
+
 };
 #endif
