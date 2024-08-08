@@ -17,11 +17,18 @@ int main()
  return 0;
 }
 */
-int main()
-{
+int main() {
 //     string s = "😊";
 //     cout << s;
-    Board game(8); //create a Board object with 8 rows and 8 columns.
+    srand(time(NULL));
+    int rows;
+    do {
+        std::cout << "Enter the size of the playable grid: ";
+        std::cin >> rows;
+        if (rows < 8)
+            std::cerr << "Warning: Grid size must be greater than or equal to 8" << std::endl;
+    } while (rows < 8);
+    Board game(rows); //create a Board object with 8 rows and 8 columns.
     game.start();
     return 0;
 }

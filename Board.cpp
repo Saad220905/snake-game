@@ -5,12 +5,12 @@ this file contains the implementations of the board class.
 
 #include "Board.hpp"
 
+//expected to never be used
 Board::Board() : Board(8) {
 }
 
 Board::Board(int m) {
-    
-    srand(1);
+    directions direction = right;
     if (m >= 8)
         numRows = m;
     else
@@ -30,8 +30,7 @@ Board::Board(int m) {
     max = 0;
 }
 
-void Board::setTarget(const int& goal)
-{
+void Board::setTarget(const int& goal) {
     target = goal;
 }
 int Board::getNumRows() const {
@@ -106,68 +105,102 @@ std::vector<Location> Board::getEmptys() const {
 }
 
 void Board::pressUp() {
-    
+    direction = up;
 }
 
 void Board::pressDown() {
-
+    direction = down;
 }
 
 void Board::pressLeft() {
-
+    direction = left;
 }
 
 void Board::pressRight() {
-
+    direction = right;
 }
 
 void Board::start() {
     int round = 1;
     int row, col;
     selectRandomCell(row, col);
-    //selectRandomCell(row, col);
     max = 1;
+    int ch;
+    // Set terminal to non-canonical mode
+    setNonCanonicalMode(true);
 
-    char ch;
     while (true) {
         if (getEmptys().size() <= 1) {
             std::cout << "Congratulation!" << std::endl;
             break;
         }
 
-        ch = getchar();
-        if (ch == 'S')
-            break;
+        // Set up the file descriptor set
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(STDIN_FILENO, &set);
 
-        if (ch == '\033') {
-            getchar();
-            switch(getchar()) {
-                case 'A':
-                    std::cout << "Round " << std::setw(4) << round << ": ";
-                    std::cout << "Press UP. " << std::endl;
-                    pressUp();
-                    round++;
-                    break;
-                case 'B':
-                    std::cout << "Round " << std::setw(4) << round << ": ";
-                    std::cout << "Press DOWN. " << std::endl;
-                    pressDown();
-                    round++;
-                    break;
-                case 'C':
-                    std::cout << "Round " << std::setw(4) << round << ": ";
-                    std::cout << "Press RIGHT. " << std::endl;
-                    pressRight();
-                    round++;
-                    break;
-                case 'D':
-                    std::cout << "Round " << std::setw(4) << round << ": ";
-                    std::cout << "Press LEFT. " << std::endl;
-                    pressLeft();
-                    round++;
-                    break;
-                
+        // Set up the timeout
+        struct timeval timeout;
+        timeout.tv_sec = 1;  // 1 second timeout
+        timeout.tv_usec = 0;
+
+        // Wait for input
+        int result = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
+
+        if (result == -1) {
+            std::cerr << "Error using select()" << std::endl;
+            break;
+        } else if (result == 0) {
+            std::cout << "No input received within 1 second." << std::endl;
+            continue; // Continue the loop, wait for input again
+        } else {
+            ch = getchar();
+
+            if (ch == 'S')
+                break;
+
+            if (ch == '\033') {
+                getchar(); // Skip the '[' character
+                switch(getchar()) {
+                    case 'A':
+                        std::cout << "Round " << std::setw(4) << round << ": ";
+                        std::cout << "Press UP. " << std::endl;
+                        pressUp();
+                        round++;
+                        break;
+                    case 'B':
+                        std::cout << "Round " << std::setw(4) << round << ": ";
+                        std::cout << "Press DOWN. " << std::endl;
+                        pressDown();
+                        round++;
+                        break;
+                    case 'C':
+                        std::cout << "Round " << std::setw(4) << round << ": ";
+                        std::cout << "Press RIGHT. " << std::endl;
+                        pressRight();
+                        round++;
+                        break;
+                    case 'D':
+                        std::cout << "Round " << std::setw(4) << round << ": ";
+                        std::cout << "Press LEFT. " << std::endl;
+                        pressLeft();
+                        round++;
+                        break;
+                }
             }
         }
+    }
+}
+
+void Board::setNonCanonicalMode(bool enable) {
+    static struct termios oldt, newt;
+    if (enable) {
+        tcgetattr(STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    } else {
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // Restore original settings
     }
 }

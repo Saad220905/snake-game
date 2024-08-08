@@ -12,6 +12,9 @@ this file contains the declarations of the board class.
 #include <iomanip>
 #include <cstdlib>
 #include <string>
+#include <sys/select.h>
+#include <unistd.h>
+#include <termios.h>
 
 struct Location {
     public:
@@ -21,6 +24,8 @@ struct Location {
 
 class Board {
 private:
+    enum directions {up, down, left, right};
+    directions direction;
     std::string** panel;
     std::vector<Location> snake;
        //two dimensional array with numRows rows and columns
@@ -57,7 +62,6 @@ public:
     void pressLeft();
     void pressRight(); //press right key
     void start(); //start the game
-
-
+    void setNonCanonicalMode(bool enable);
 };
 #endif //BOARD_H
