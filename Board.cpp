@@ -46,7 +46,7 @@ void Board::print() const {
     itr = snake.begin();
     panel[itr->row][itr->col] = " 🐸 ";
     itr++;
-    for (; itr < snake.end(); itr++) {
+    for (; itr != snake.end(); itr++) {
         panel[itr->row][itr->col] = " 🟩 ";
     }
 
