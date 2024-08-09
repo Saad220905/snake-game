@@ -24,11 +24,11 @@ struct Location {
 
 class Board {
 private:
+    std::deque<Location> snake;
     std::deque<Location>::iterator itr;
     enum directions {up, down, left, right};
     directions direction;
     std::string** panel;
-    std::deque<Location> snake;
        //two dimensional array with numRows rows and columns
     Location head;
     Location tail;
@@ -47,7 +47,7 @@ public:
 
     void clear();
         //set each cell of the panel to be zero
-    void print() const;
+    void print();
         //print the panel
     std::vector<Location> getEmptys() const;
     void selectRandomCell(int& row, int& col);

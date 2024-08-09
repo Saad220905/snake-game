@@ -41,15 +41,13 @@ void Board::clear() {
     }
 }
 
-void Board::print() const {
+void Board::print() {
     clear();
-    itr = snake.begin();
-    panel[itr->row][itr->col] = " 🐸 ";
-    itr++;
-    for (; itr != snake.end(); itr++) {
+    for (itr = snake.begin(); itr != snake.end(); itr++) {
+        if (itr == snake.begin())
+            panel[itr->row][itr->col] = " 🐸 ";
         panel[itr->row][itr->col] = " 🟩 ";
     }
-
     for(int r = 0; r < numRows; r++) {
         std::cout << "+";
         for(int c = 0; c < numRows; c++) {
