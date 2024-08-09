@@ -43,11 +43,11 @@ void Board::clear() {
 
 void Board::print() const {
     clear();
-    ptr = snake.begin();
-    panel[ptr->row][ptr->col] = " 🐸 ";
-    ++ptr;
-    for (; ptr < snake.end(); ++ptr) {
-        panel[ptr->row][ptr->col] = " 🟩 ";
+    itr = snake.begin();
+    panel[itr->row][itr->col] = " 🐸 ";
+    itr++;
+    for (; itr < snake.end(); itr++) {
+        panel[itr->row][itr->col] = " 🟩 ";
     }
 
     for(int r = 0; r < numRows; r++) {

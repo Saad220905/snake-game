@@ -24,7 +24,7 @@ struct Location {
 
 class Board {
 private:
-    std::deque<Location>::iterator ptr;
+    std::deque<Location>::iterator itr;
     enum directions {up, down, left, right};
     directions direction;
     std::string** panel;
