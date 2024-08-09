@@ -10,11 +10,8 @@ Board::Board() : Board(8) {
 }
 
 Board::Board(int m) {
-    directions direction = right;
-    if (m >= 8)
-        numRows = m;
-    else
-        numRows = 8;
+    direction = right;
+    numRows = m;
 
     panel = new std::string*[numRows];
     for (int col = 0; col < numRows; col++) {
@@ -27,7 +24,6 @@ Board::Board(int m) {
     
     panel[numRows/2][numRows/2] = " 🐸 ";
     panel[numRows/2][(numRows/2)-1] = " 🟩 ";
-    max = 0;
 }
 
 void Board::setTarget(const int& goal) {
@@ -35,10 +31,6 @@ void Board::setTarget(const int& goal) {
 }
 int Board::getNumRows() const {
     return numRows;
-}
-
-int Board::getMax() const {
-    return max;
 }
 
 void Board::clear() {
@@ -50,6 +42,14 @@ void Board::clear() {
 }
 
 void Board::print() const {
+    clear();
+    ptr = snake.begin();
+    panel[ptr->row][ptr->col] = " 🐸 ";
+    ++ptr;
+    for (; ptr < snake.end(); ++ptr) {
+        panel[ptr->row][ptr->col] = " 🟩 ";
+    }
+
     for(int r = 0; r < numRows; r++) {
         std::cout << "+";
         for(int c = 0; c < numRows; c++) {
@@ -105,28 +105,98 @@ std::vector<Location> Board::getEmptys() const {
 }
 
 void Board::pressUp() {
-    direction = up;
+    if (direction != down)
+        direction = up;
 }
 
 void Board::pressDown() {
-    direction = down;
+    if (direction != up)
+        direction = down;
 }
 
 void Board::pressLeft() {
-    direction = left;
+    if (direction != right)
+        direction = left;
 }
 
 void Board::pressRight() {
-    direction = right;
+    if (direction != left)
+        direction = right;
+}
+
+void Board::move() {
+    if (direction == right) {
+        if(head.col + 1 == 8) {
+            restart();
+        } else {
+            head.col += 1;
+            snake.push_front(head);
+            snake.pop_back();
+        }
+    } else if (direction == left) {
+        if(head.col - 1 == -1) {
+            restart();
+        } else {
+            head.col -= 1;
+            snake.push_front(head);
+            snake.pop_back();
+        }
+    } else if (direction == up) {
+        if(head.row - 1 == -1) {
+            restart();
+        } else {
+            head.row -= 1;
+            snake.push_front(head);
+            snake.pop_back();
+        }
+    } else if (direction == down) {
+        if(head.row + 1 == 8) {
+            restart();
+        } else {
+            head.row += 1;
+            snake.push_front(head);
+            snake.pop_back();
+        }
+    }
+}
+
+void Board::restart() {
+    setNonCanonicalMode(false);
+    std::cout << "Game over, would you like to restart? (y)/(n): ";
+    char response;
+    std::cin >> response;
+    if (response == 'y') {
+        int rows;
+        do {
+            std::cout << "Enter the size of the playable grid: ";
+            std::cin >> rows;
+            if (rows < 8)
+                std::cerr << "Warning: Grid size must be greater than or equal to 8" << std::endl;
+        } while (rows < 8);
+        direction = right;
+        numRows = rows;
+        clear();
+        snakeLength = 2;
+        while(!(snake.empty()))
+            snake.pop_back();
+        head = {numRows/2,numRows/2};
+        tail = {numRows/2,(numRows/2)-1};
+        panel[numRows/2][numRows/2] = " 🐸 ";
+        panel[numRows/2][(numRows/2)-1] = " 🟩 ";
+        start();
+    }
+    else {
+        std::cerr << "error in the restart" << std::endl;
+        abort();
+    }
 }
 
 void Board::start() {
     int round = 1;
     int row, col;
     selectRandomCell(row, col);
-    max = 1;
     int ch;
-    // Set terminal to non-canonical mode
+    // Set terminal to non-canonical mode aka not requiring the user the press enter for each keystroke
     setNonCanonicalMode(true);
 
     while (true) {
@@ -152,8 +222,10 @@ void Board::start() {
             std::cerr << "Error using select()" << std::endl;
             break;
         } else if (result == 0) {
-            std::cout << "No input received within 1 second." << std::endl;
-            continue; // Continue the loop, wait for input again
+            //std::cout << "No input received within 1 second." << std::endl;
+            //continue; // Continue the loop, wait for input again
+            move();
+            print();
         } else {
             ch = getchar();
 

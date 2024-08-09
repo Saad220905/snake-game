@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.tsx": "typescriptreact",
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__locale": "cpp",
@@ -43,7 +44,13 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "deque": "cpp",
+        "optional": "cpp",
+        "queue": "cpp",
+        "unordered_map": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

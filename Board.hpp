@@ -8,7 +8,7 @@ this file contains the declarations of the board class.
 
 #include <iostream>
 #include <vector>
-#include <array>
+#include <deque>
 #include <iomanip>
 #include <cstdlib>
 #include <string>
@@ -24,18 +24,15 @@ struct Location {
 
 class Board {
 private:
+    std::deque<Location>::iterator ptr;
     enum directions {up, down, left, right};
     directions direction;
     std::string** panel;
-    std::vector<Location> snake;
+    std::deque<Location> snake;
        //two dimensional array with numRows rows and columns
     Location head;
     Location tail;
     int numRows;
-    int max; //the current max in all cells of panel
-        //apply dynamic memory for panel
-        //so that panel has numRows rows and
-        //numCols columns
     int target;
     int snakeLength;
 
@@ -44,11 +41,9 @@ public:
     Board(int m); //construct a m x m panel
     void setTarget(const int& goal);
         //set target (goal) of the game
-    void allocateMemory();
     int getNumRows() const;
     int getNumCols() const;
     int getTarget() const;
-    int getMax() const;
 
     void clear();
         //set each cell of the panel to be zero
@@ -61,6 +56,8 @@ public:
     void pressDown();
     void pressLeft();
     void pressRight(); //press right key
+    void move();
+    void restart();
     void start(); //start the game
     void setNonCanonicalMode(bool enable);
 };
