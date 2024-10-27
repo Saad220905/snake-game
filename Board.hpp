@@ -27,9 +27,8 @@ private:
     std::deque<Location> snake;
     std::deque<Location>::iterator itr;
     enum directions {up, down, left, right};
-    directions direction;
-    std::string** panel;
-       //two dimensional array with numRows rows and columns
+    directions direction; //direction the snake is currently facing
+    std::string** panel; //two dimensional array with numRows rows and columns
     Location head;
     Location tail;
     int numRows;
