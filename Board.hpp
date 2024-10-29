@@ -8,7 +8,7 @@ this file contains the declarations of the board class.
 
 #include <iostream>
 #include <vector>
-#include <deque>
+#include <queue>
 #include <iomanip>
 #include <cstdlib>
 #include <string>
@@ -23,9 +23,8 @@ struct Location {
 };
 
 class Board {
-private:
-    std::deque<Location> snake;
-    std::deque<Location>::iterator itr;
+    std::queue<Location> snake;
+    std::queue<Location>::iterator itr;
     enum directions {up, down, left, right};
     directions direction; //direction the snake is currently facing
     std::string** panel; //two dimensional array with numRows rows and columns
@@ -34,30 +33,23 @@ private:
     int numRows;
     int target;
     int snakeLength;
-
-public:
-    Board(); //construct a 8 x 8 panel
-    Board(int m); //construct a m x m panel
-    void setTarget(const int& goal);
-        //set target (goal) of the game
-    int getNumRows() const;
-    int getNumCols() const;
-    int getTarget() const;
-
-    void clear();
-        //set each cell of the panel to be zero
-    void print();
-        //print the panel
+    void setTarget(const int& goal); //set target (goal) of the game
+    void clear(); //set each cell of the panel to be zero
+    void print(); //print the panel
     std::vector<Location> getEmptys() const;
-    void selectRandomCell(int& row, int& col);
-        //select a random cell from empty cell
+    bool isEmpty(const Location& square) const;
+    void selectRandomCell(int& row, int& col); //select a random cell from empty cell
     void pressUp();
     void pressDown();
     void pressLeft();
-    void pressRight(); //press right key
+    void pressRight();
     void move();
     void restart();
-    void start(); //start the game
     void setNonCanonicalMode(bool enable);
+
+public:
+    //Explicit cannot be used here
+    Board(int m = 8); //construct a m x m panel
+    void start(); //start the game
 };
 #endif //BOARD_H

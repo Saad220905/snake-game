@@ -1,4 +1,3 @@
-# This is an example Makefile for 1024 game project. 
 # This program uses Board and main modules.
 # Typing 'make' or 'make run' will create the executable file.
 
@@ -20,25 +19,20 @@ CFLAGS  = -g -Wall
 all: run
 
 # To create the executable file run we need the object files
-# RunCompetition.o, Competition.o, Hare.o, Tortoise.o, and Road.o:
 run:  main.o Board.o 
 	$(CC) -o run main.o Board.o
 	$(RM) *.o
 
-# To create the object file RunCompetition.o, we need the source
-# files RunCompetition.cpp, Competition.h 
+# To create the object file, we need the source
 main.o:  main.cpp
 	$(CC) -c main.cpp
 
-# To create the object file Competition.o, we need the source
-# files Competition.cpp and Competition.h 
-#
+# To create the object file, we need the source
 Board.o:  Board.cpp
 	$(CC) -c Board.cpp
 
 # To start over from scratch, type 'make clean'.  This
 # removes the executable file, as well as old .o object
 # files and *~ backup files:
-#
 clean: 
 	$(RM) run *~ a.out

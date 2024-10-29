@@ -5,11 +5,7 @@ this file contains the implementations of the board class.
 
 #include "Board.hpp"
 
-//expected to never be used
-Board::Board() : Board(8) {
-}
-
-Board::Board(int m) {
+Board::Board(int m)  {
     direction = right;
     numRows = m;
 
@@ -19,8 +15,8 @@ Board::Board(int m) {
     }
     clear();
     snakeLength = 2;
-    head = {numRows/2,numRows/2};
-    tail = {numRows/2,(numRows/2)-1};
+    head = {numRows / 2, numRows / 2};
+    tail = {numRows / 2, (numRows / 2) - 1};
     
     panel[numRows/2][numRows/2] = " 🐸 ";
     panel[numRows/2][(numRows/2)-1] = " 🟩 ";
@@ -28,9 +24,6 @@ Board::Board(int m) {
 
 void Board::setTarget(const int& goal) {
     target = goal;
-}
-int Board::getNumRows() const {
-    return numRows;
 }
 
 void Board::clear() {
@@ -43,10 +36,11 @@ void Board::clear() {
 
 void Board::print() {
     clear();
-    for (itr = snake.begin(); itr != snake.end(); itr++) {
-        if (itr == snake.begin())
+    for (itr = snake.front(); itr != snake.back(); itr++) {
+        if (itr == snake.front())
             panel[itr->row][itr->col] = " 🐸 ";
-        panel[itr->row][itr->col] = " 🟩 ";
+        else
+            panel[itr->row][itr->col] = " 🟩 ";
     }
     for(int r = 0; r < numRows; r++) {
         std::cout << "+";
@@ -71,6 +65,8 @@ void Board::print() {
     std::cout << std::endl;
 }
 
+//Fix this function because what if it places the apple in an area completely
+//surrounded by the snake, and had no choice but to die.
 void Board::selectRandomCell(int& row, int& col) {
     std::vector<Location> emptys = getEmptys();
     if(emptys.size() > 0) {
@@ -89,17 +85,14 @@ void Board::selectRandomCell(int& row, int& col) {
 std::vector<Location> Board::getEmptys() const {
     std::vector<Location> emptys;
     Location cell;
-
-    for(int i = 0; i < numRows; i++) {
-        for(int j = 0; j < numRows; j++) {
-            if(panel[i][j] == " ") {
-                cell.row = i;
-                cell.col = j;
-                emptys.push_back(cell);
-            }
-        }
-    }
+    for(int i = 0; i < numRows; i++)
+        for(int j = 0; j < numRows; j++)
+            if(isEmpty(panel[i][j])) emptys.push_back(cell);
     return emptys;
+}
+
+bool Board::isEmpty(const Location& square) const {
+    if(panel[square.row][square.col] == " ") return true;
 }
 
 void Board::pressUp() {
@@ -124,36 +117,36 @@ void Board::pressRight() {
 
 void Board::move() {
     if (direction == right) {
-        if(head.col + 1 == 8) {
+        if(head.col + 1 == numRows) {
             restart();
         } else {
             head.col += 1;
-            snake.push_front(head);
-            snake.pop_back();
+            snake.push(head);
+            snake.pop();
         }
     } else if (direction == left) {
         if(head.col - 1 == -1) {
             restart();
         } else {
             head.col -= 1;
-            snake.push_front(head);
-            snake.pop_back();
+            snake.push(head);
+            snake.pop();
         }
     } else if (direction == up) {
         if(head.row - 1 == -1) {
             restart();
         } else {
             head.row -= 1;
-            snake.push_front(head);
-            snake.pop_back();
+            snake.push(head);
+            snake.pop();
         }
     } else if (direction == down) {
-        if(head.row + 1 == 8) {
+        if(head.row + 1 == numRows) {
             restart();
         } else {
             head.row += 1;
-            snake.push_front(head);
-            snake.pop_back();
+            snake.push(head);
+            snake.pop();
         }
     }
 }
@@ -176,7 +169,7 @@ void Board::restart() {
         clear();
         snakeLength = 2;
         while(!(snake.empty()))
-            snake.pop_back();
+            snake.pop();
         head = {numRows/2,numRows/2};
         tail = {numRows/2,(numRows/2)-1};
         panel[numRows/2][numRows/2] = " 🐸 ";
