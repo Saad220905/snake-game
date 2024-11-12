@@ -9,6 +9,7 @@ this file contains the declarations of the board class.
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <deque>
 #include <iomanip>
 #include <cstdlib>
 #include <string>
@@ -20,11 +21,21 @@ struct Location {
     public:
         int row;
         int col;
+
+    bool operator==(const Location& otherL) const
+    {
+        return (row == otherL.row && col == otherL.col);
+    }
+
+    bool operator!=(const Location& otherL) const
+    {
+        return !(*this==otherL);
+    }
 };
 
 class Board {
-    std::queue<Location> snake;
-    std::queue<Location>::iterator itr;
+    std::deque<Location> snake;
+    std::deque<Location>::iterator itr;
     enum directions {up, down, left, right};
     directions direction; //direction the snake is currently facing
     std::string** panel; //two dimensional array with numRows rows and columns

@@ -36,8 +36,8 @@ void Board::clear() {
 
 void Board::print() {
     clear();
-    for (itr = snake.front(); itr != snake.back(); itr++) {
-        if (itr == snake.front())
+    for (*itr = snake.front(); *itr != snake.back(); itr++) {
+        if (*itr == snake.front())
             panel[itr->row][itr->col] = " 🐸 ";
         else
             panel[itr->row][itr->col] = " 🟩 ";
@@ -87,12 +87,12 @@ std::vector<Location> Board::getEmptys() const {
     Location cell;
     for(int i = 0; i < numRows; i++)
         for(int j = 0; j < numRows; j++)
-            if(isEmpty(panel[i][j])) emptys.push_back(cell);
+            if(panel[i][j] == " ") emptys.push_back(cell);
     return emptys;
 }
 
 bool Board::isEmpty(const Location& square) const {
-    if(panel[square.row][square.col] == " ") return true;
+    return (panel[square.row][square.col] == " ");
 }
 
 void Board::pressUp() {
@@ -121,32 +121,32 @@ void Board::move() {
             restart();
         } else {
             head.col += 1;
-            snake.push(head);
-            snake.pop();
+            snake.push_front(head);
+            snake.pop_back();
         }
     } else if (direction == left) {
         if(head.col - 1 == -1) {
             restart();
         } else {
             head.col -= 1;
-            snake.push(head);
-            snake.pop();
+            snake.push_front(head);
+            snake.pop_back();
         }
     } else if (direction == up) {
         if(head.row - 1 == -1) {
             restart();
         } else {
             head.row -= 1;
-            snake.push(head);
-            snake.pop();
+            snake.push_front(head);
+            snake.pop_back();
         }
     } else if (direction == down) {
         if(head.row + 1 == numRows) {
             restart();
         } else {
             head.row += 1;
-            snake.push(head);
-            snake.pop();
+            snake.push_front(head);
+            snake.pop_back();
         }
     }
 }
@@ -169,7 +169,7 @@ void Board::restart() {
         clear();
         snakeLength = 2;
         while(!(snake.empty()))
-            snake.pop();
+            snake.pop_back();
         head = {numRows/2,numRows/2};
         tail = {numRows/2,(numRows/2)-1};
         panel[numRows/2][numRows/2] = " 🐸 ";
