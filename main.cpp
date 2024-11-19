@@ -18,8 +18,6 @@ int main()
 }
 */
 int main() {
-//     string s = "😊";
-//     cout << s;
     srand(time(NULL));
     int rows;
     do {

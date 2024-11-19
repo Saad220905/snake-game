@@ -10,15 +10,13 @@ Board::Board(int m)  {
     numRows = m;
 
     panel = new std::string*[numRows];
-    for (int col = 0; col < numRows; col++) {
+    for (int col = 0; col < numRows; col++)
         panel[col] = new std::string[numRows];
-    }
-    clear();
+    clear(); // setting all the indices to " "
     snakeLength = 2;
     head = {numRows / 2, numRows / 2};
-    tail = {numRows / 2, (numRows / 2) - 1};
-    
     panel[numRows/2][numRows/2] = " 🐸 ";
+    tail = {numRows / 2, (numRows / 2) - 1};
     panel[numRows/2][(numRows/2)-1] = " 🟩 ";
 }
 
@@ -27,16 +25,14 @@ void Board::setTarget(const int& goal) {
 }
 
 void Board::clear() {
-    for (int row = 0; row < numRows; row++) {
-        for (int col = 0; col < numRows; col++) {
+    for (int row = 0; row < numRows; row++)
+        for (int col = 0; col < numRows; col++)
             panel[row][col] = " ";
-        }
-    }
 }
 
 void Board::print() {
-    clear();
-    for (*itr = snake.front(); *itr != snake.back(); itr++) {
+    clear(); // setting all the indices to " "
+    for (itr = snake.begin(); itr != snake.end(); itr++) {
         if (*itr == snake.front())
             panel[itr->row][itr->col] = " 🐸 ";
         else
@@ -50,10 +46,10 @@ void Board::print() {
         std::cout << std::endl;
         std::cout << "|";
         for(int c = 0; c < numRows; c++) {
-            if(panel[r][c] != " ") {
-                std::cout << std::setw(4) << panel[r][c] << "|";
-            } else {
+            if(panel[r][c] == " ") {
                 std::cout << "    |";
+            } else {
+                std::cout << std::setw(4) << panel[r][c] << "|";
             }
         }
         std::cout << std::endl;
@@ -84,10 +80,13 @@ void Board::selectRandomCell(int& row, int& col) {
 
 std::vector<Location> Board::getEmptys() const {
     std::vector<Location> emptys;
-    Location cell;
+    Location empty;
     for(int i = 0; i < numRows; i++)
         for(int j = 0; j < numRows; j++)
-            if(panel[i][j] == " ") emptys.push_back(cell);
+            if(panel[i][j] == " ") {
+                empty = panel[i][j];
+                emptys.push_back(empty);
+            }
     return emptys;
 }
 
@@ -157,6 +156,7 @@ void Board::restart() {
     char response;
     std::cin >> response;
     if (response == 'y') {
+        srand(time(NULL));
         int rows;
         do {
             std::cout << "Enter the size of the playable grid: ";
@@ -164,19 +164,12 @@ void Board::restart() {
             if (rows < 8)
                 std::cerr << "Warning: Grid size must be greater than or equal to 8" << std::endl;
         } while (rows < 8);
-        direction = right;
-        numRows = rows;
-        clear();
-        snakeLength = 2;
-        while(!(snake.empty()))
-            snake.pop_back();
-        head = {numRows/2,numRows/2};
-        tail = {numRows/2,(numRows/2)-1};
-        panel[numRows/2][numRows/2] = " 🐸 ";
-        panel[numRows/2][(numRows/2)-1] = " 🟩 ";
-        start();
-    }
-    else {
+        Board game(rows); //create a Board object with 8 rows and 8 columns.
+        game.start();
+    } else if (response == 'n') {
+        std::cout << "Better luck next time!\n" << std::endl;
+        exit(0);
+    } else {
         std::cerr << "error in the restart" << std::endl;
         abort();
     }

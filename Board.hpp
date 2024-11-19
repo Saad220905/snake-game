@@ -8,7 +8,6 @@ this file contains the declarations of the board class.
 
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <deque>
 #include <iomanip>
 #include <cstdlib>
@@ -22,16 +21,19 @@ struct Location {
         int row;
         int col;
 
-    bool operator==(const Location& otherL) const {
-        return (row == otherL.row && col == otherL.col);
+    void operator=(const Location& other) {
+        if (this != &other) {  // Prevent self-assignment
+            row = other.row;
+            col = other.col;
+        }
+        return *this;
     }
-
-    bool operator!=(const Location& otherL) const {
-        return !(*this==otherL);
-    }
+    bool operator==(const Location& otherL) const => row == otherL.row && col == otherL.col;
+    bool operator!=(const Location& otherL) const => !(*this == otherL);
 };
 
 class Board {
+private:
     std::deque<Location> snake;
     std::deque<Location>::iterator itr;
     enum directions {up, down, left, right};
