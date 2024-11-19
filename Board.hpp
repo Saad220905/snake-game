@@ -22,13 +22,11 @@ struct Location {
         int row;
         int col;
 
-    bool operator==(const Location& otherL) const
-    {
+    bool operator==(const Location& otherL) const {
         return (row == otherL.row && col == otherL.col);
     }
 
-    bool operator!=(const Location& otherL) const
-    {
+    bool operator!=(const Location& otherL) const {
         return !(*this==otherL);
     }
 };
