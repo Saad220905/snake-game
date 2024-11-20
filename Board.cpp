@@ -80,13 +80,16 @@ void Board::selectRandomCell(int& row, int& col) {
 
 std::vector<Location> Board::getEmptys() const {
     std::vector<Location> emptys;
-    Location empty;
-    for(int i = 0; i < numRows; i++)
-        for(int j = 0; j < numRows; j++)
-            if(panel[i][j] == " ") {
-                empty = panel[i][j];
+    for (int i = 0; i < numRows; i++) {
+        for (int j = 0; j < numRows; j++) {
+            if (panel[i][j] == " ") {
+                Location empty;
+                empty.row = i;
+                empty.col = j;
                 emptys.push_back(empty);
             }
+        }
+    }
     return emptys;
 }
 

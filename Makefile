@@ -21,7 +21,7 @@ all: run
 # To create the executable file run we need the object files
 run:  main.o Board.o 
 	$(CC) -o run main.o Board.o
-	$(RM) *.o
+#	$(RM) *.o
 
 # To create the object file, we need the source
 main.o:  main.cpp

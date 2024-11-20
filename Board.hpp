@@ -17,19 +17,24 @@ this file contains the declarations of the board class.
 #include <termios.h>
 
 struct Location {
-    public:
-        int row;
-        int col;
+    int row;
+    int col;
 
-    void operator=(const Location& other) {
-        if (this != &other) {  // Prevent self-assignment
+    Location& operator=(const Location& other) {
+        if (this != &other) {
             row = other.row;
             col = other.col;
         }
         return *this;
     }
-    bool operator==(const Location& otherL) const => row == otherL.row && col == otherL.col;
-    bool operator!=(const Location& otherL) const => !(*this == otherL);
+
+    bool operator==(const Location& otherL) const {
+        return row == otherL.row && col == otherL.col;
+    }
+
+    bool operator!=(const Location& otherL) const {
+        return !(*this == otherL);
+    }
 };
 
 class Board {
