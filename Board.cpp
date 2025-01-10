@@ -2,6 +2,7 @@
 This is a snake game built built by Rachel and Saad,
 this file contains the implementations of the board class.
 */
+
 #include "Board.hpp"
 
 Board::Board(int m, std::string snakeBody) : numRows(m), direction(right), directionChanged(false), snakeLength(2), snakeBody(snakeBody) {
