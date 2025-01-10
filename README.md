@@ -62,8 +62,6 @@ The `Board` class manages the game's board, including the placement of the snake
 
 ### Known Issues & Limitations
 
-- The game implementation is incomplete, and some features may not work as expected.
-- There may be edge cases not handled, such as extremely small or large board sizes.
 - The game may not render well on some terminal environments.
 
 ## Future Enhancements
