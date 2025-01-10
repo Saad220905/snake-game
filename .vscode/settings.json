@@ -54,7 +54,10 @@
         "iterator": "cpp",
         "forward_list": "cpp",
         "future": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "charconv": "cpp",
+        "memory": "cpp",
+        "print": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

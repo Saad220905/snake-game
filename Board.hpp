@@ -7,19 +7,20 @@ this file contains the declarations of the board class.
 #define BOARD_H
 
 #include <iostream>
+#include <iomanip>
+#include <termios.h>
+#include <unistd.h>
 #include <vector>
 #include <deque>
-#include <iomanip>
 #include <cstdlib>
-#include <string>
-#include <sys/select.h>
-#include <unistd.h>
-#include <termios.h>
+#include <ctime>
 
+// Location structure for coordinate management
 struct Location {
     int row;
     int col;
 
+    // Assignment operator
     Location& operator=(const Location& other) {
         if (this != &other) {
             row = other.row;
@@ -28,6 +29,7 @@ struct Location {
         return *this;
     }
 
+    // Comparison operators
     bool operator==(const Location& otherL) const {
         return row == otherL.row && col == otherL.col;
     }
@@ -38,34 +40,48 @@ struct Location {
 };
 
 class Board {
+public:
+    // Constructor
+    explicit Board(int m, std::string snakeBody); // Construct a m x m panel
+    
+    // Destructor (moved to public)
+    ~Board();
+    
+    // Game control
+    void start(); // Start the game
+
 private:
+    // Enums
+    enum directions {up, down, left, right};
+
+    // Member variables
     std::deque<Location> snake;
     std::deque<Location>::iterator itr;
-    enum directions {up, down, left, right};
-    directions direction; //direction the snake is currently facing
-    std::string** panel; //two dimensional array with numRows rows and columns
+    directions direction;        // Direction the snake is currently facing
+    std::string** panel;        // Two dimensional array with numRows rows and columns
     Location head;
     Location tail;
+    std::string snakeBody;
     int numRows;
-    int target;
     int snakeLength;
-    void setTarget(const int& goal); //set target (goal) of the game
-    void clear(); //set each cell of the panel to be zero
-    void print(); //print the panel
+    bool directionChanged;
+
+    // Board operations
+    void clear();               // Set each cell of the panel to be empty
+    void print();               // Print the panel
     std::vector<Location> getEmptys() const;
-    bool isEmpty(const Location& square) const;
-    void selectRandomCell(int& row, int& col); //select a random cell from empty cell
+    void selectRandomCell(int& row, int& col); // Select a random empty cell
+
+    // Movement controls
     void pressUp();
     void pressDown();
     void pressLeft();
     void pressRight();
     void move();
+
+    // Game state management
     void restart();
     void setNonCanonicalMode(bool enable);
-
-public:
-    //Explicit cannot be used here
-    Board(int m = 8); //construct a m x m panel
-    void start(); //start the game
 };
-#endif //BOARD_H
+
+#endif // BOARD_H
