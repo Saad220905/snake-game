@@ -38,7 +38,7 @@ int main() {
             std::cout << "Pick a color:\n\tA: 🟩\n\tB: 🟥\n\tC: 🟪\n\tD: 🟨\n\tE: 🟦\n\tF: 🟧\n\tG: 🟫\n\nAnswer: ";
             std::cin >> Color;
         } while (!(Answer == "A" || Answer == "B"|| Answer == "C"|| Answer == "D"|| Answer == "E"|| Answer == "F"|| Answer == "G" ||
-                   Answer == "a" || Answer == "b"|| Answer == "c"|| Answer == "d"|| Answer == "e"|| Answer == "f"|| Answer == "f"));
+                   Answer == "a" || Answer == "b"|| Answer == "c"|| Answer == "d"|| Answer == "e"|| Answer == "f"|| Answer == "g"));
         if (Color == "A" || Color == "a") snakeBody = "🟩";
         else if (Color == "B" || Color == "b") snakeBody = "🟥";
         else if (Color == "C" || Color == "c") snakeBody = "🟪";

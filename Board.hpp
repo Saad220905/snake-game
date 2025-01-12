@@ -3,8 +3,8 @@ This is a snake game built built by Rachel and Saad,
 this file contains the declarations of the board class.
 */
 
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef BOARD_HPP
+#define BOARD_HPP
 
 #include <iostream>
 #include <iomanip>
@@ -84,4 +84,4 @@ private:
     void setNonCanonicalMode(bool enable);
 };
 
-#endif // BOARD_H
+#endif // BOARD_HPP
