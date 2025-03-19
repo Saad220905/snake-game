@@ -35,4 +35,4 @@ Board.o:  Board.cpp
 # removes the executable file, as well as old .o object
 # files and *~ backup files:
 clean: 
-	$(RM) run *~ a.out
+	$(RM) run *~ a.out *.o
