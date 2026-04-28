@@ -1,298 +1,205 @@
-/*
-This is a snake game built built by Rachel and Saad,
-this file contains the implementations of the board class.
-*/
-
 #include "Board.hpp"
+#include <algorithm>
+#include <ctime>
 
-Board::Board(int m, std::string snakeBody) : numRows(m), direction(right), directionChanged(false), snakeLength(2), snakeBody(snakeBody) {
-    if (m < 8)
-        throw std::invalid_argument("Board size must be at least 8x8");
-    panel = new std::string*[numRows];
-    for (int i = 0; i < numRows; i++) 
-        panel[i] = new std::string[numRows];
-    clear();
-    head = {numRows / 2, numRows / 2};
-    tail = {numRows / 2, (numRows / 2) - 1};
-    snake.push_back(tail);
-    snake.push_back(head);
-    panel[head.row][head.col] = " 🐸 ";
-    panel[tail.row][tail.col] = " 🟩 ";
+// Zen / Soft Cafe Aesthetic Colors
+const Color ZEN_BACKGROUND = { 235, 228, 215, 255 }; // Warm parchment
+const Color ZEN_INK        = { 85, 75, 70, 255 };    // Soft charcoal/sepia
+const Color ZEN_MATCHA     = { 158, 170, 140, 255 }; // Desaturated sage
+const Color ZEN_BLUSH      = { 205, 170, 160, 255 }; // Muted rose
+const Color ZEN_GRID       = { 220, 210, 195, 255 }; // Extremely faint grid
+const Color ZEN_ACCENT     = { 180, 160, 140, 255 }; // Muted tan
+
+Game::Game(int gridSize, std::string snakeColorName) 
+    : currentState(State::MENU), 
+      gridSize(gridSize), 
+      score(0), 
+      highScore(0),
+      moveTimer(0),
+      moveSpeed(0.4f) // Zen speed: very slow and deliberate
+{
+    cellSize = (screenWidth - 2 * padding) / gridSize;
+    snakeColor = getColorFromName(snakeColorName);
+    
+    InitWindow(screenWidth, screenHeight, "Snake: Zen Edition");
+    SetTargetFPS(60);
+    
+    initGame();
 }
 
-Board::~Board() {
-    for (int i = 0; i < numRows; i++)
-        delete[] panel[i];
-    delete[] panel;
+Game::~Game() {
+    CloseWindow();
 }
 
-void Board::clear() {
-    for (int row = 0; row < numRows; row++)
-        for (int col = 0; col < numRows; col++)
-            panel[row][col] = " ";
+void Game::initGame() {
+    snake.clear();
+    int startX = gridSize / 2;
+    int startY = gridSize / 2;
+    
+    snake.push_front({startX - 1, startY});
+    snake.push_front({startX, startY});
+    
+    direction = {1, 0};
+    nextDirection = direction;
+    
+    score = 0;
+    moveSpeed = 0.4f; // Stay slow
+    spawnFood();
 }
 
-void Board::print() {
-    // Temporary board to preserve apples
-    std::string** tempPanel = new std::string*[numRows];
-    for (int i = 0; i < numRows; i++) {
-        tempPanel[i] = new std::string[numRows];
-        for (int j = 0; j < numRows; j++) {
-            if (panel[i][j] == " 🍎 ") {
-                tempPanel[i][j] = " 🍎 ";
-            } else {
-                tempPanel[i][j] = " ";
+void Game::spawnFood() {
+    bool valid = false;
+    while (!valid) {
+        food = { GetRandomValue(0, gridSize - 1), GetRandomValue(0, gridSize - 1) };
+        valid = true;
+        for (const auto& segment : snake) {
+            if (segment == food) {
+                valid = false;
+                break;
             }
         }
     }
-    // Draw snake on temporary board
-    for (auto itr = snake.begin(); itr != snake.end(); itr++) {
-        if (*itr == snake.front()) {
-            tempPanel[itr->row][itr->col] = " 🐸 ";
-        } else {
-            tempPanel[itr->row][itr->col] = " " + snakeBody + " ";
+}
+
+void Game::run() {
+    while (!WindowShouldClose()) {
+        update();
+        draw();
+    }
+}
+
+void Game::update() {
+    if (currentState == State::MENU) {
+        if (IsKeyPressed(KEY_ENTER)) currentState = State::PLAYING;
+    } else if (currentState == State::PLAYING) {
+        handleInput();
+        
+        moveTimer += GetFrameTime();
+        if (moveTimer >= moveSpeed) {
+            moveTimer = 0;
+            moveSnake();
+            checkCollision();
         }
-    }
-    // Update main panel and print
-    for(int r = 0; r < numRows; r++) {
-        std::cout << "+";
-        for(int c = 0; c < numRows; c++) {
-            std::cout << "----+";
+    } else if (currentState == State::GAME_OVER) {
+        if (IsKeyPressed(KEY_ENTER)) {
+            initGame();
+            currentState = State::PLAYING;
         }
-        std::cout << std::endl;
-        std::cout << "|";
-        for(int c = 0; c < numRows; c++) {
-            panel[r][c] = tempPanel[r][c];
-            if(panel[r][c] == " ") {
-                std::cout << "    |";
-            } else {
-                std::cout << std::setw(4) << panel[r][c] << "|";
-            }
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "+";
-    for(int c = 0; c < numRows; c++) {
-        std::cout << "----+";
-    }
-    std::cout << std::endl;
-    // Cleanup temporary panel memory
-    for (int i = 0; i < numRows; i++)
-        delete[] tempPanel[i];
-    delete[] tempPanel;
-}
-
-void Board::selectRandomCell(int& row, int& col) {
-    std::vector<Location> validCells = getEmptys();
-    if (!validCells.empty()) {
-        int index = rand() % validCells.size();
-        row = validCells[index].row;
-        col = validCells[index].col;
-        panel[row][col] = " 🍎 ";
-        print();
-    } else {
-        std::cout << "Congratulations! You filled the grid!" << std::endl;
-        exit(0);
+        if (IsKeyPressed(KEY_M)) currentState = State::MENU;
     }
 }
 
-std::vector<Location> Board::getEmptys() const {
-    std::vector<Location> validEmptys;
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numRows; j++) {
-            if (panel[i][j] == " ") {
-                bool hasNeighbor = false;
-                for (int di = -1; di <= 1; di++) {
-                    for (int dj = -1; dj <= 1; dj++) {
-                        if (di == 0 && dj == 0) continue;
-                        int ni = i + di, nj = j + dj;
-                        if (ni >= 0 && ni < numRows && nj >= 0 && nj < numRows && panel[ni][nj] == " ") {
-                            hasNeighbor = true;
-                            break;
-                        }
-                    }
-                    if (hasNeighbor) break;
-                }
-                if (hasNeighbor) {
-                    validEmptys.push_back({i, j});
-                }
-            }
-        }
-    }
-    return validEmptys;
+void Game::handleInput() {
+    if (IsKeyPressed(KEY_UP) && direction.y == 0) nextDirection = {0, -1};
+    if (IsKeyPressed(KEY_DOWN) && direction.y == 0) nextDirection = {0, 1};
+    if (IsKeyPressed(KEY_LEFT) && direction.x == 0) nextDirection = {-1, 0};
+    if (IsKeyPressed(KEY_RIGHT) && direction.x == 0) nextDirection = {1, 0};
 }
 
-void Board::pressUp() {
-    if (direction != down && !directionChanged) {
-        direction = up;
-        directionChanged = true;
-    }
-}
-
-void Board::pressDown() {
-    if (direction != up && !directionChanged) {
-        direction = down;
-        directionChanged = true;
-    }
-}
-
-void Board::pressLeft() {
-    if (direction != right && !directionChanged) {
-        direction = left;
-        directionChanged = true;
-    }
-}
-
-void Board::pressRight() {
-    if (direction != left && !directionChanged) {
-        direction = right;
-        directionChanged = true;
-    }
-}
-
-void Board::move() {
-    Location nextHead = head;
-    directionChanged = false;
-    switch (direction) {
-        case right: nextHead.col += 1; break;
-        case left:  nextHead.col -= 1; break;
-        case up:    nextHead.row -= 1; break;
-        case down:  nextHead.row += 1; break;
-    }
-    if (nextHead.row < 0 || nextHead.row >= numRows || 
-        nextHead.col < 0 || nextHead.col >= numRows || 
-        panel[nextHead.row][nextHead.col] == " 🟩 ") {
-        std::cout << "\nGame Over! Snake hit a wall or itself!\n";
-        restart();
-        return;
-    }
-    snake.push_front(nextHead);
-    head = nextHead;
-    if (panel[nextHead.row][nextHead.col] == " 🍎 ") {
-        snakeLength++;
-        int row, col;
-        selectRandomCell(row, col);
+void Game::moveSnake() {
+    direction = nextDirection;
+    Location newHead = { snake.front().x + direction.x, snake.front().y + direction.y };
+    
+    snake.push_front(newHead);
+    
+    if (newHead == food) {
+        score += 1;
+        if (score > highScore) highScore = score;
+        // Hardly increase speed to keep it relaxing
+        moveSpeed = std::max(0.3f, 0.4f - (score / 200.0f)); 
+        spawnFood();
     } else {
         snake.pop_back();
     }
-    print();
 }
 
-void Board::setNonCanonicalMode(bool enable) {
-    static struct termios oldt, newt;
-    if (enable) {
-        tcgetattr(STDIN_FILENO, &oldt);
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    } else {
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+void Game::checkCollision() {
+    Location head = snake.front();
+    if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+        currentState = State::GAME_OVER;
+        return;
+    }
+    for (size_t i = 1; i < snake.size(); ++i) {
+        if (head == snake[i]) {
+            currentState = State::GAME_OVER;
+            return;
+        }
+    }
+}
+
+void Game::draw() {
+    BeginDrawing();
+    ClearBackground(ZEN_BACKGROUND);
+
+    switch (currentState) {
+        case State::MENU: drawMenu(); break;
+        case State::PLAYING: drawGame(); break;
+        case State::GAME_OVER: drawGameOver(); break;
+    }
+
+    EndDrawing();
+}
+
+void Game::drawMenu() {
+    DrawText("Breathe", screenWidth/2 - MeasureText("Breathe", 30)/2, screenHeight/2 - 60, 30, ZEN_INK);
+    DrawText("Zen Snake", screenWidth/2 - MeasureText("Zen Snake", 15)/2, screenHeight/2 - 10, 15, ZEN_ACCENT);
+    DrawText("Press ENTER to begin", screenWidth/2 - MeasureText("Press ENTER to begin", 18)/2, screenHeight/2 + 60, 18, ZEN_ACCENT);
+}
+
+void Game::drawGame() {
+    drawGrid();
+    
+    // Draw Food (Soft Circle)
+    Vector2 foodPos = gridToScreen(food.x, food.y);
+    DrawCircleV({foodPos.x + cellSize/2, foodPos.y + cellSize/2}, cellSize/3, ZEN_BLUSH);
+    DrawCircleLinesV({foodPos.x + cellSize/2, foodPos.y + cellSize/2}, cellSize/3 + 1, ColorAlpha(ZEN_INK, 0.2f));
+
+    // Draw Snake
+    for (size_t i = 0; i < snake.size(); ++i) {
+        Vector2 pos = gridToScreen(snake[i].x, snake[i].y);
+        Color color = (i == 0) ? snakeColor : ColorAlpha(snakeColor, 0.6f);
+        
+        // Softer segments
+        float shrink = (i == 0) ? 4.0f : 6.0f;
+        DrawRectangleRounded({pos.x + shrink, pos.y + shrink, (float)cellSize - shrink*2, (float)cellSize - shrink*2}, 0.8f, 16, color);
+        
+        if (i == 0) {
+            // Subtle eyes
+            DrawCircle(pos.x + cellSize/3, pos.y + cellSize/2, 1.5f, ZEN_INK);
+            DrawCircle(pos.x + 2*cellSize/3, pos.y + cellSize/2, 1.5f, ZEN_INK);
+        }
+    }
+
+    // UI - Minimal and Softer
+    DrawText(TextFormat("collected: %i", score), padding, 30, 18, ZEN_ACCENT);
+    DrawText(TextFormat("record: %i", highScore), screenWidth - padding - MeasureText(TextFormat("record: %i", highScore), 18), 30, 18, ZEN_ACCENT);
+}
+
+void Game::drawGameOver() {
+    DrawRectangle(0, 0, screenWidth, screenHeight, ColorAlpha(ZEN_BACKGROUND, 0.9f));
+    DrawText("A moment's rest.", screenWidth/2 - MeasureText("A moment's rest.", 25)/2, screenHeight/2 - 30, 25, ZEN_INK);
+    DrawText("Press ENTER to continue", screenWidth/2 - MeasureText("Press ENTER to continue", 15)/2, screenHeight/2 + 40, 15, ZEN_ACCENT);
+}
+
+void Game::drawGrid() {
+    // Fainter grid
+    for (int i = 0; i <= gridSize; i++) {
+        DrawLine(padding + i * cellSize, padding, padding + i * cellSize, padding + gridSize * cellSize, ZEN_GRID);
+        DrawLine(padding, padding + i * cellSize, padding + gridSize * cellSize, padding + i * cellSize, ZEN_GRID);
     }
 }
 
-void Board::start() {
-    srand(static_cast<unsigned>(time(nullptr)));
-    int round = 1;
-    int row, col;
-    selectRandomCell(row, col);
-    setNonCanonicalMode(true);
-    while (true) {
-        if (getEmptys().empty()) {
-            std::cout << "Congratulations! You've won!" << std::endl;
-            break;
-        }
-        fd_set set;
-        FD_ZERO(&set);
-        FD_SET(STDIN_FILENO, &set);
-        struct timeval timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 300000;  // 300ms
-        int result = select(STDIN_FILENO + 1, &set, nullptr, nullptr, &timeout);
-        if (result == -1) {
-            std::cerr << "Error in select()" << std::endl;
-            break;
-        } else if (result == 0) {
-            move();
-        } else {
-            int ch = getchar();
-            if (ch == 'S' || ch == 's') {
-                break;
-            }
-            if (ch == '\033') {  // Arrow key was pressed
-                getchar();  // Skip the '[' character
-                switch(getchar()) {  // The actual arrow key
-                    case 'A': 
-                        pressUp();
-                        std::cout << "Round " << std::setw(4) << round++ << ": UP" << std::endl;
-                        break;
-                    case 'B': 
-                        pressDown();
-                        std::cout << "Round " << std::setw(4) << round++ << ": DOWN" << std::endl;
-                        break;
-                    case 'C': 
-                        pressRight();
-                        std::cout << "Round " << std::setw(4) << round++ << ": RIGHT" << std::endl;
-                        break;
-                    case 'D': 
-                        pressLeft();
-                        std::cout << "Round " << std::setw(4) << round++ << ": LEFT" << std::endl;
-                        break;
-                }
-                move();
-            }
-        }
-    }
-    setNonCanonicalMode(false);
+Vector2 Game::gridToScreen(int x, int y) {
+    return { (float)(padding + x * cellSize), (float)(padding + y * cellSize) };
 }
 
-void Board::restart() {
-    setNonCanonicalMode(false);
-    std::cout << "Would you like to restart? (y/n): ";
-    char response;
-    std::cin >> response;
-    if (response == 'y' || response == 'Y') {
-        int rows;
-        std::string Answer, Color, snakeBody;
-        do {
-            std::cout << "Enter the size of the playable grid: ";
-            std::cin >> rows;
-            if (rows < 8)
-                std::cerr << "Warning: Grid size must be greater than or equal to 8" << std::endl;
-        } while (rows < 8);
-        std::cout << std::endl;
-        do {
-        std::cout << "What do you want the snake's body to be made out of:\n\tA: A color\n\tB: A Custom Emoji (or character)\n\nAnswer: ";
-        std::cin >> Answer;
-        } while (!(Answer == "A" || Answer == "B" || Answer == "a" || Answer == "b"));
-        std::cout << std::endl;
-        if(Answer == "A" || Answer == "a") {
-            do {
-                std::cout << "Pick a color:\n\tA: 🟩\n\tB: 🟥\n\tC: 🟪\n\tD: 🟨\n\tE: 🟦\n\tF: 🟧\n\tG: 🟫\n\nAnswer: ";
-                std::cin >> Color;
-            } while (!(Answer == "A" || Answer == "B"|| Answer == "C"|| Answer == "D"|| Answer == "E"|| Answer == "F"|| Answer == "G" ||
-                    Answer == "a" || Answer == "b"|| Answer == "c"|| Answer == "d"|| Answer == "e"|| Answer == "f"|| Answer == "f"));
-            if (Color == "A" || Color == "a") snakeBody = "🟩";
-            else if (Color == "B" || Color == "b") snakeBody = "🟥";
-            else if (Color == "C" || Color == "c") snakeBody = "🟪";
-            else if (Color == "D" || Color == "d") snakeBody = "🟨";
-            else if (Color == "E" || Color == "e") snakeBody = "🟦";
-            else if (Color == "F" || Color == "f") snakeBody = "🟧";
-            else if (Color == "G" || Color == "g") snakeBody = "🟫";
-            std::cout << std::endl;
-        } else {
-            do {
-                std::cout << "Pick any emoji (or character)\n\nAnswer: ";
-                std::cin >> snakeBody;
-            } while (snakeBody.length() != 1 || snakeBody == " ");
-            std::cout << std::endl;
-        }
-        Board game(rows, snakeBody); //create a Board object with 8 rows and 8 columns.
-        game.start();
-    } else if (response == 'n' || response == 'N') {
-        std::cout << "Thanks for playing!\n";
-        exit(0);
-    } else {
-        std::cerr << "Invalid input. Exiting game.\n";
-        exit(1);
-    }
+Color Game::getColorFromName(std::string name) {
+    if (name == "🟩") return ZEN_MATCHA;
+    if (name == "🟥") return { 210, 180, 170, 255 }; // Muted Blush
+    if (name == "🟪") return { 180, 175, 190, 255 }; // Muted Lavender
+    if (name == "🟨") return { 220, 205, 180, 255 }; // Sand
+    if (name == "🟦") return { 170, 185, 195, 255 }; // Muted Sky
+    if (name == "🟧") return { 210, 190, 160, 255 }; // Soft Terracotta
+    if (name == "🟫") return ZEN_ACCENT;
+    return ZEN_MATCHA;
 }

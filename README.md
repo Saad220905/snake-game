@@ -1,84 +1,55 @@
-# Snake Game
+# Snake: Polished Edition
 
-This is a classic Snake game implemented in C++ by Rachel and Saad. The game involves guiding a snake to eat food while avoiding collisions with walls or itself. The snake grows longer as it eats, making the game progressively more challenging.
+A modern, visually appealing Snake game built with C++ and Raylib. This version moves away from the terminal and into a dedicated high-performance window with smooth animations, a scoring system, and refined aesthetics.
 
-## Features
+## New Features (GUI Version)
 
-- **Classic Snake Gameplay**: The game follows the traditional Snake game rules, where the snake grows as it consumes food, and the game ends if the snake runs into itself or the walls.
-- **Dynamic Board Size**: The board size can be customized, with a minimum grid size of 8x8.
-- **Arrow Key Controls**: Use the arrow keys to navigate the snake (Up, Down, Left, Right).
-- **Random Food Placement**: The game randomly places food on the board for the snake to consume.
-- **Restart Functionality**: Players can restart the game if they lose.
-- **Terminal Non-Canonical Mode**: The game uses non-canonical mode for real-time controls.
+- **Proper Windowed Interface**: Runs in a dedicated 800x800 window using hardware-accelerated rendering.
+- **Polished Visuals**:
+    - **Rounded Snake Body**: Smooth segments with dynamic shading.
+    - **Animated Snake Head**: Includes eyes that look in the direction of movement.
+    - **Glow Effects**: Food and snake head have subtle visual enhancements.
+- **Scoring System**: Real-time score tracking and persistent High Score.
+- **Dynamic Difficulty**: The game speed increases as you eat more food, providing a greater challenge.
+- **Interactive Menu**: Start screen and Game Over screen with smooth transitions.
+- **Enhanced Grid Rendering**: subtle, modern grid background.
+
+## Prerequisites
+
+- C++20 or later
+- [Raylib](https://www.raylib.com/) (`brew install raylib` on macOS)
 
 ## Getting Started
 
-### Prerequisites
-
-- C++ compiler (e.g., `g++`)
-- Makefile support (optional)
-
-### Installation
-
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/snake-game.git
-    cd snake-game
-    ```
-
-2. Compile the game:
+1. **Compile the game**:
     ```bash
     make
     ```
 
-3. Run the game:
+2. **Run the game**:
     ```bash
-    ./snake_game
+    ./run
     ```
 
-### Controls
+## Controls
 
-- **Arrow Keys**: Move the snake in the corresponding direction.
-- **`S` key**: Stop the game.
-- **`y/n`**: Choose whether to restart the game after losing.
+- **Arrow Keys**: Navigate the snake.
+- **Enter**: Start game from menu or restart after Game Over.
+- **M**: Return to main menu from Game Over screen.
+- **ESC**: Close the window.
 
-### Game Rules
+## Customization
 
-1. **Objective**: Guide the snake to eat the food (🍎). Each time the snake eats, it grows longer.
-2. **Avoid Collisions**: If the snake runs into the walls or itself, the game is over.
-3. **Winning Condition**: Clear all available spaces on the board.
+Upon launching, the game allows you to customize your experience via the console:
+1.  **Grid Size**: Choose a size between 10 and 40 for varying difficulty.
+2.  **Snake Color**: Select from several vibrant colors (Green, Red, Purple, Yellow, Blue, Orange, Brown).
 
-## Code Overview
+## Implementation Details
 
-### `Board` Class
-
-The `Board` class manages the game's board, including the placement of the snake, food, and tracking game state.
-
-- **Constructor**: Initializes the board size and sets up the initial snake position.
-- **Movement Handling**: Moves the snake based on the current direction. Handles collisions with boundaries.
-- **Food Placement**: Randomly places food on an empty cell in the grid.
-- **Restart Functionality**: Restarts the game upon user input after losing.
-- **Display**: Prints the board to the terminal, showing the snake (🟩) and food (🍎).
-
-### Known Issues & Limitations
-
-- The game may not render well on some terminal environments.
-
-## Future Enhancements
-
-- **Add a scoring system** to track the player's score based on the number of foods consumed.
-- **Implement levels or increasing difficulty** as the snake grows.
-- **Add sound effects** for a more immersive experience.
-- **Improve the graphical interface** using a library like SDL or ncurses.
-
-## Contributing
-
-Feel free to submit pull requests or report issues to improve the game.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+- **Engine**: Built using Raylib for high-performance 2D graphics.
+- **State Machine**: Manages transitions between Menu, Playing, and Game Over states.
+- **Modern C++**: Utilizes `std::deque` for snake body management and `operator<=>` for coordinate comparisons.
 
 ---
 
-Enjoy the game and have fun guiding the snake to victory!
+Enjoy the polished experience of a classic reimagined!
